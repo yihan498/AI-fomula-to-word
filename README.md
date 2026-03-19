@@ -1,38 +1,51 @@
-# ChatGPT → Word（含公式）
+# AI 公式 → Word
 
-在 ChatGPT 页面选中任意段落（包含数学公式），按 **Ctrl+C**，浏览器自动下载一个 `.docx` 文件，用 Word 打开后公式是**原生可编辑**的格式，不是图片、不是乱码。
+在 ChatGPT、DeepSeek、Kimi、豆包等 AI 聊天页面，选中含数学公式的段落，按 **Ctrl+C**，浏览器自动下载一个 `.docx` 文件。用 Word 打开后，公式是**原生可编辑**的格式——不是图片，不是乱码，可以直接双击修改。
 
 ---
 
-## 原理
+## 支持的网站
 
-| 环节 | 做了什么 |
-|------|---------|
-| Chrome 扩展 | 拦截复制事件，从 KaTeX 结构中提取原始 LaTeX |
-| 本地 Python 服务器 | 接收 LaTeX → 转换为 OMML（Word 原生公式格式）→ 生成 .docx |
-| 用户操作 | 下载 .docx，用 Word 打开，公式可直接编辑 |
+| 网站 | 网址 |
+|------|------|
+| ChatGPT | chatgpt.com |
+| DeepSeek | chat.deepseek.com |
+| Kimi | kimi.moonshot.cn / kimi.ai |
+| 豆包 | www.doubao.com |
 
-浏览器剪贴板无法可靠传递 Word 公式对象，所以绕过剪贴板，改为本地生成文件。
+同时支持 **Chrome** 和 **Edge** 浏览器。
+
+---
+
+## 为什么不是直接 Ctrl+C → Ctrl+V 粘贴？
+
+浏览器剪贴板无法可靠地把公式传给 Word——Word 收到的是网页渲染结果，会变成乱码或 LaTeX 原文。本工具的做法是：
+
+1. 扩展从页面 KaTeX 结构中提取原始 LaTeX
+2. 本地 Python 服务器把 LaTeX 转换为 OMML（Word 原生公式格式）
+3. 直接生成 `.docx` 文件供下载
+
+完全绕开剪贴板，公式格式由程序控制，结果稳定可靠。
 
 ---
 
 ## 前提条件
 
-- **Chrome** 浏览器
-- **Python 3.8+**（[下载地址](https://www.python.org/downloads/)，安装时勾选 "Add Python to PATH"）
-- **Microsoft Word**（打开生成的 .docx）
+- **Chrome 或 Edge** 浏览器
+- **Python 3.8 及以上**（[官网下载](https://www.python.org/downloads/)，Windows 安装时务必勾选 **"Add Python to PATH"**）
+- **Microsoft Word**（用于打开生成的文件）
 
 ---
 
-## 安装步骤
+## 安装（只需做一次）
 
 ### 第一步：下载项目
 
-点右上角 **Code → Download ZIP**，解压到任意文件夹（例如桌面）。
+点页面右上角 **Code → Download ZIP**，解压到任意位置（建议桌面）。
 
 ### 第二步：安装 Python 依赖
 
-**Windows**：双击 `server/install.bat`，等窗口显示"安装成功"后关闭。
+**Windows**：双击 `server/install.bat`，等窗口出现"安装成功"后关闭。
 
 **macOS / Linux**：
 ```bash
@@ -40,40 +53,51 @@ cd server
 chmod +x install.sh && ./install.sh
 ```
 
-### 第三步：加载 Chrome 扩展
+安装的依赖包括：`flask`、`flask-cors`、`python-docx`、`latex2mathml`、`lxml`。
 
-1. Chrome 地址栏输入 `chrome://extensions/`
+### 第三步：加载浏览器扩展
+
+**Chrome**：
+1. 地址栏输入 `chrome://extensions/`
 2. 右上角打开**开发者模式**
 3. 点击**"加载已解压的扩展程序"**
 4. 选择本项目的 `dist/` 文件夹
-5. 扩展图标出现在工具栏即安装成功
+
+**Edge**：
+1. 地址栏输入 `edge://extensions/`
+2. 左下角打开**开发人员模式**
+3. 点击**"加载解压缩的扩展"**
+4. 选择本项目的 `dist/` 文件夹
+
+工具栏出现扩展图标即安装成功。
 
 ---
 
 ## 每次使用
 
-1. **启动服务器**
-   - Windows：双击 `server/start.bat`，保持黑色窗口开着
-   - macOS/Linux：`cd server && ./start.sh`
+**第一步：启动本地服务器**（每次使用前需要运行，关闭窗口则停止）
 
-2. 打开 ChatGPT，**选中**含公式的段落
+- Windows：双击 `server/start.bat`，保持黑色窗口开着
+- macOS/Linux：`cd server && ./start.sh`
 
-3. 按 **Ctrl+C**（选区含公式时自动拦截）
+**第二步：在 AI 网站选中含公式的段落**
 
-4. 浏览器弹出下载提示 → 用 Word 打开下载的文件，公式可编辑
+**第三步：按 Ctrl+C**
 
-> **纯文字段落**（无公式）不拦截，Ctrl+C 照常复制到剪贴板。
+浏览器弹出下载提示，保存文件后用 Word 打开，公式即可编辑。
+
+> 纯文字段落（不含公式）不会被拦截，Ctrl+C 照常复制到剪贴板。
 
 ---
 
-## 扩展 Popup 状态说明
+## 扩展图标状态说明
 
-点击 Chrome 工具栏里的扩展图标可查看状态：
+点击浏览器工具栏的扩展图标可查看当前状态：
 
 | 圆点颜色 | 含义 |
 |----------|------|
-| 🟢 绿色 | 正常 |
-| 🟡 黄色 | 不在 ChatGPT 页面 |
+| 🟢 绿色 | 一切正常 |
+| 🟡 黄色 | 当前不在支持的 AI 网站 |
 | 🔴 红色 | 本地服务器未启动，请先运行 start.bat |
 
 ---
@@ -81,37 +105,40 @@ chmod +x install.sh && ./install.sh
 ## 目录结构
 
 ```
-dist/          ← 可直接加载的 Chrome 扩展（已构建好，无需额外操作）
-src/           ← 扩展源码
+dist/                   ← 直接加载的浏览器扩展（已构建完成）
+src/
   content/
-    content-extractor.js   # 从 KaTeX DOM 提取 LaTeX 结构
-    copy-handler.js        # 拦截复制事件，调用本地服务器
+    content-extractor.js  # 从 KaTeX DOM 中提取 LaTeX 和段落结构
+    copy-handler.js       # 拦截 Ctrl+C，调用本地服务器
+  popup/
+    popup.html/js/css     # 扩展图标弹出面板
 server/
-  server.py          # Flask 服务器入口
-  latex_to_omml.py   # LaTeX → MathML → OMML 转换
-  docx_builder.py    # 构建 .docx 文件
-  requirements.txt   # Python 依赖列表
-  install.bat        # Windows 一键安装
-  install.sh         # macOS/Linux 一键安装
-  start.bat          # Windows 启动服务器
-  start.sh           # macOS/Linux 启动服务器
+  server.py             # Flask 服务器，接收请求并返回 .docx
+  latex_to_omml.py      # LaTeX → MathML → OMML 转换逻辑
+  docx_builder.py       # 组装 .docx 文件
+  requirements.txt      # Python 依赖列表
+  install.bat / .sh     # 一键安装依赖
+  start.bat / .sh       # 启动服务器
 ```
 
 ---
 
 ## 常见问题
 
-**Q：双击 install.bat 闪退？**
-A：Python 未加入 PATH。重装 Python，安装时勾选 "Add Python to PATH"。
+**Q：双击 install.bat 窗口一闪而过？**
+A：Python 未加入系统 PATH。重装 Python，安装时勾选 "Add Python to PATH"，重启电脑后再试。
 
-**Q：下载的 .docx 公式显示为斜体文字而非公式？**
-A：该公式 LaTeX 语法较复杂，转换失败时回退为原始 LaTeX 文本。可在 Issues 里提交样例。
+**Q：start.bat 启动后，扩展图标仍显示红色？**
+A：刷新 AI 网站页面，再点一次扩展图标查看状态。
 
-**Q：服务器已启动，扩展 Popup 仍显示红色？**
-A：刷新 ChatGPT 页面后再点扩展图标查看。
+**Q：下载的 .docx 里公式显示为斜体文字而不是公式？**
+A：该公式的 LaTeX 语法较复杂，转换失败时会回退显示原始 LaTeX 文本。可在 [Issues](https://github.com/yihan498/AI-fomula-to-word/issues) 里提交公式样例，我会改进支持。
 
 **Q：macOS 提示"无法验证开发者"？**
-A：系统偏好设置 → 安全性与隐私 → 点"仍要打开"。
+A：系统设置 → 隐私与安全性 → 点"仍要打开"。
+
+**Q：Kimi 或豆包的公式没有被识别？**
+A：确认选中的段落里包含公式后再按 Ctrl+C。如果仍无效，请在 Issues 里反馈。
 
 ---
 
