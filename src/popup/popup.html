@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatGPT → Word</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <span class="logo">📐</span>
+      <h1>ChatGPT → Word</h1>
+    </div>
+
+    <!-- 页面状态 -->
+    <div class="status" id="status-page">
+      <span class="dot" id="dot-page"></span>
+      <span id="text-page">检测中…</span>
+    </div>
+
+    <!-- 服务器状态 -->
+    <div class="status" id="status-server">
+      <span class="dot" id="dot-server"></span>
+      <span id="text-server">检测本地服务器…</span>
+    </div>
+
+    <div class="instructions">
+      <p class="step"><span class="num">1</span> 双击 <code>server/start.bat</code> 启动本地服务器</p>
+      <p class="step"><span class="num">2</span> 在 ChatGPT 页面<strong>选中</strong>含公式的段落</p>
+      <p class="step"><span class="num">3</span> 按 <kbd>Ctrl+C</kbd> — 浏览器自动下载 <code>.docx</code></p>
+      <p class="step"><span class="num">4</span> 直接用 Word 打开下载的文件，公式可编辑</p>
+      <p class="tip">纯文字段落（无公式）仍正常复制到剪贴板。</p>
+    </div>
+
+    <div class="footer">
+      <span>v0.2.0</span>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

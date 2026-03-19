@@ -1,0 +1,21 @@
+{
+  "name": "chatgpt-to-word",
+  "version": "0.1.0",
+  "description": "Browser extension: copy any selected ChatGPT output (text + formulas + tables + lists) and paste into Microsoft Word with full formatting preserved.",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js --watch",
+    "test": "node test/test-node.js"
+  },
+  "keywords": [
+    "chatgpt",
+    "word",
+    "mathml",
+    "latex",
+    "browser-extension"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "jsdom": "^24.1.3"
+  }
+}

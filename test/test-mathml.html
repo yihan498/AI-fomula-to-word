@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>MathML 提取测试</title>
+  <style>
+    body { font-family: sans-serif; max-width: 960px; margin: 40px auto; padding: 0 20px; background: #fafafa; }
+    h2 { border-bottom: 2px solid #333; padding-bottom: 6px; }
+    .pass { color: #2e7d32; font-weight: bold; }
+    .fail { color: #c62828; font-weight: bold; }
+    .result-item { margin: 6px 0; padding: 8px 12px; border-radius: 4px; background: #fff; border: 1px solid #e0e0e0; }
+    #output { background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 6px; font-size: 11px; white-space: pre-wrap; word-break: break-all; max-height: 400px; overflow-y: auto; }
+    button { padding: 10px 20px; background: #1565c0; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 4px; font-size: 14px; }
+    button:hover { background: #0d47a1; }
+    .section { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 16px; margin: 16px 0; }
+    .note { background: #fff3e0; border-left: 4px solid #ff9800; padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<h1>ChatGPT→Word 公式提取测试</h1>
+
+<div class="note">
+  ⚠️ 本测试使用静态预置的 KaTeX 输出 HTML（不依赖网络），直接验证提取逻辑。
+</div>
+
+<div class="section">
+  <h2>操作</h2>
+  <button onclick="runTests()">▶ 运行全部测试</button>
+  <button onclick="copyResult()">📋 复制处理结果（粘贴进 Word 验证）</button>
+</div>
+
+<div class="section">
+  <h2>测试结果</h2>
+  <div id="results"><em>点击"运行全部测试"开始</em></div>
+</div>
+
+<div class="section">
+  <h2>处理后 HTML（供 Word 粘贴）</h2>
+  <div id="output">（运行测试后显示）</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  静态测试数据：模拟 KaTeX 渲染后的真实 HTML 结构
+//  （KaTeX 会把公式同时渲染为视觉 HTML + MathML，我们要提取 MathML）
+// ═══════════════════════════════════════════════════════════════
+
+// 模拟行内公式 $E = mc^2$ 的 KaTeX 输出
+const INLINE_KATEX_HTML = `<span class="katex">
+  <span class="katex-html" aria-hidden="true">
+    <span class="base"><span class="mord mathnormal">E</span><span class="mrel">=</span><span class="mord mathnormal">m</span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist"><span><span class="pstrut"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span>
+  </span>
+  <math xmlns="http://www.w3.org/1998/Math/MathML">
+    <semantics>
+      <mrow>
+        <mi>E</mi><mo>=</mo><mi>m</mi>
+        <msup><mi>c</mi><mn>2</mn></msup>
+      </mrow>
+      <annotation encoding="application/x-tex">E = mc^2</annotation>
+    </semantics>
+  </math>
+</span>`;
+
+// 模拟块级公式 $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$ 的 KaTeX 输出
+const DISPLAY_KATEX_HTML = `<span class="katex-display">
+  <span class="katex">
+    <span class="katex-html" aria-hidden="true">
+      <span class="base"><span class="mord mathnormal">x</span><span class="mrel">=</span></span>
+    </span>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+      <semantics>
+        <mrow>
+          <mi>x</mi><mo>=</mo>
+          <mfrac>
+            <mrow><mo>−</mo><mi>b</mi><mo>±</mo><msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup><mo>−</mo><mn>4</mn><mi>a</mi><mi>c</mi></mrow></msqrt></mrow>
+            <mrow><mn>2</mn><mi>a</mi></mrow>
+          </mfrac>
+        </mrow>
+        <annotation encoding="application/x-tex">x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}</annotation>
+      </semantics>
+    </math>
+  </span>
+</span>`;
+
+// 完整测试输入：混合段落 + 行内公式 + 块级公式 + 列表 + 表格
+const TEST_INPUT = `
+<div class="markdown-content" data-message-id="abc123">
+  <p class="para" style="color:black">二次方程 ${INLINE_KATEX_HTML} 的解由求根公式给出：</p>
+  ${DISPLAY_KATEX_HTML}
+  <ul>
+    <li class="list-item">牛顿第二定律：${INLINE_KATEX_HTML}</li>
+    <li class="list-item">能量守恒</li>
+  </ul>
+  <table class="md-table" data-rows="2">
+    <thead><tr><th class="th">公式</th><th class="th">含义</th></tr></thead>
+    <tbody>
+      <tr><td>${INLINE_KATEX_HTML}</td><td>质能方程</td></tr>
+    </tbody>
+  </table>
+</div>
+`;
+
+// ═══════════════════════════════════════════════════════════════
+//  核心逻辑（内联，与 src/utils/ 保持一致）
+// ═══════════════════════════════════════════════════════════════
+
+function replaceKatexWithMathML(htmlString) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlString, "text/html");
+
+  // 先处理块级，再处理行内（避免重复处理嵌套节点）
+  const displayNodes = Array.from(doc.querySelectorAll(".katex-display"));
+  const inlineNodes  = Array.from(doc.querySelectorAll(".katex:not(.katex-display .katex)"));
+
+  displayNodes.forEach((node) => {
+    const mathEl = node.querySelector("math");
+    if (!mathEl) return;
+    const clone = mathEl.cloneNode(true);
+    clone.setAttribute("display", "block");
+    node.replaceWith(clone);
+  });
+
+  inlineNodes.forEach((node) => {
+    const mathEl = node.querySelector("math");
+    if (!mathEl) return;
+    const clone = mathEl.cloneNode(true);
+    clone.setAttribute("display", "inline");
+    node.replaceWith(clone);
+  });
+
+  return doc.body.innerHTML;
+}
+
+const ALLOWED_TAGS = new Set([
+  "p","br","strong","b","em","i","u","s","sup","sub",
+  "ul","ol","li","table","thead","tbody","tfoot","tr","th","td",
+  "pre","code","h1","h2","h3","h4","h5","h6","a","blockquote","hr",
+]);
+
+const MATHML_TAGS = new Set([
+  "math","mrow","mn","mi","mo","msup","msub","msubsup","mfrac","msqrt","mroot",
+  "mtext","mover","munder","munderover","mtable","mtr","mtd","mstyle","merror",
+  "mpadded","mspace","mfenced","menclose","semantics","annotation","annotation-xml",
+]);
+
+function cleanNode(node) {
+  if (node.nodeType === 3) return;
+  if (node.nodeType !== 1) { node.remove(); return; }
+
+  const tag = node.tagName.toLowerCase();
+  if (MATHML_TAGS.has(tag)) return;
+
+  if (!ALLOWED_TAGS.has(tag)) {
+    const parent = node.parentNode;
+    if (!parent) return;
+    while (node.firstChild) parent.insertBefore(node.firstChild, node);
+    node.remove();
+    return;
+  }
+
+  const toRemove = [];
+  for (const attr of node.attributes) {
+    const n = attr.name;
+    if (n.startsWith("data-") || n.startsWith("aria-") ||
+        n === "class" || n === "id" || n === "style" || n === "tabindex") {
+      toRemove.push(n);
+    }
+  }
+  toRemove.forEach((a) => node.removeAttribute(a));
+  Array.from(node.childNodes).forEach(cleanNode);
+}
+
+function cleanHTML(htmlString) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlString, "text/html");
+  cleanNode(doc.body);
+  return doc.body.innerHTML;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  测试执行
+// ═══════════════════════════════════════════════════════════════
+
+let processedHTML = "";
+
+function runTests() {
+  // 统计原始输入中 katex 节点数
+  const inputDoc = new DOMParser().parseFromString(TEST_INPUT, "text/html");
+  const originalKatexCount = inputDoc.querySelectorAll(".katex").length;
+  const originalMathCount  = inputDoc.querySelectorAll("math").length;
+
+  // 执行两步处理
+  const step1 = replaceKatexWithMathML(TEST_INPUT);
+  const step2 = cleanHTML(step1);
+  processedHTML = step2;
+
+  const outDoc = new DOMParser().parseFromString(step2, "text/html");
+
+  const tests = [
+    {
+      name: `原始输入含 ${originalKatexCount} 个 .katex 节点`,
+      pass: originalKatexCount > 0,
+      detail: "前提条件检查",
+    },
+    {
+      name: "处理后无残留 .katex 节点",
+      pass: outDoc.querySelectorAll(".katex").length === 0,
+      detail: `剩余: ${outDoc.querySelectorAll(".katex").length}`,
+    },
+    {
+      name: "<math> 节点已提取",
+      pass: outDoc.querySelectorAll("math").length > 0,
+      detail: `找到 ${outDoc.querySelectorAll("math").length} 个 <math>（原始嵌套 MathML: ${originalMathCount}）`,
+    },
+    {
+      name: "块级公式有 display=block",
+      pass: outDoc.querySelectorAll("math[display='block']").length > 0,
+      detail: `找到 ${outDoc.querySelectorAll("math[display='block']").length} 个`,
+    },
+    {
+      name: "行内公式有 display=inline",
+      pass: outDoc.querySelectorAll("math[display='inline']").length > 0,
+      detail: `找到 ${outDoc.querySelectorAll("math[display='inline']").length} 个`,
+    },
+    {
+      name: "清理后无 class 属性（MathML 内除外）",
+      pass: (() => {
+        // 不计 MathML 内的 class（MathML 规范允许）
+        const allWithClass = Array.from(outDoc.querySelectorAll("[class]"));
+        const nonMath = allWithClass.filter(el => !el.closest("math"));
+        return nonMath.length === 0;
+      })(),
+      detail: (() => {
+        const allWithClass = Array.from(outDoc.querySelectorAll("[class]"));
+        const nonMath = allWithClass.filter(el => !el.closest("math"));
+        return `HTML 层（非 MathML）class 属性数: ${nonMath.length}`;
+      })(),
+    },
+    {
+      name: "data-* 属性已清除",
+      pass: outDoc.querySelectorAll("[data-message-id],[data-rows]").length === 0,
+      detail: "检查 data-message-id, data-rows 等",
+    },
+    {
+      name: "列表结构 <ul><li> 保留",
+      pass: outDoc.querySelectorAll("ul li").length > 0,
+      detail: `找到 ${outDoc.querySelectorAll("ul li").length} 个 <li>`,
+    },
+    {
+      name: "表格结构 <table><td> 保留",
+      pass: outDoc.querySelectorAll("table td").length > 0,
+      detail: `找到 ${outDoc.querySelectorAll("table td").length} 个 <td>`,
+    },
+    {
+      name: "MathML annotation 保留（含原始 LaTeX）",
+      pass: outDoc.querySelectorAll("annotation").length > 0,
+      detail: `找到 ${outDoc.querySelectorAll("annotation").length} 个 <annotation>`,
+    },
+  ];
+
+  const passed = tests.filter(t => t.pass).length;
+  const total  = tests.length;
+
+  const html = `
+    <div style="margin-bottom:12px; font-size:15px;">
+      总计：<strong>${total}</strong> 项 &nbsp;|&nbsp;
+      <span class="pass">通过: ${passed}</span> &nbsp;|&nbsp;
+      <span class="fail">失败: ${total - passed}</span>
+    </div>
+    ${tests.map(t => `
+      <div class="result-item">
+        <span class="${t.pass ? 'pass' : 'fail'}">${t.pass ? '✓ PASS' : '✗ FAIL'}</span>
+        &nbsp; <strong>${t.name}</strong>
+        &nbsp; <small style="color:#666">${t.detail}</small>
+      </div>
+    `).join("")}
+  `;
+
+  document.getElementById("results").innerHTML = html;
+  document.getElementById("output").textContent = step2.replace(/></g, ">\n<");
+}
+
+async function copyResult() {
+  if (!processedHTML) { alert("请先运行测试"); return; }
+  try {
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        "text/html":  new Blob([processedHTML], { type: "text/html" }),
+        "text/plain": new Blob(["[公式内容，请在 Word 中查看]"], { type: "text/plain" }),
+      }),
+    ]);
+    alert("已复制！\n打开 Word → Ctrl+V\n查看：公式是否显示为原生公式，表格/列表是否完整。");
+  } catch (e) {
+    alert("复制失败：" + e.message + "\n\n可能需要 HTTPS 环境或用户授权剪贴板权限。");
+  }
+}
+</script>
+</body>
+</html>
