@@ -3,7 +3,8 @@
 /**
  * copy-handler.js  (路径 B 版本)
  *
- * 拦截 ChatGPT 助手回复区的 Ctrl+C：
+ * 支持网站：ChatGPT、DeepSeek（均使用 KaTeX 渲染公式）
+ *
  *  - 无公式 → 放行浏览器原生复制（不拦截）
  *  - 有公式 → 阻断默认复制，把结构化内容 POST 给本地服务器，
  *              服务器返回 .docx，扩展自动触发文件下载。
@@ -12,12 +13,18 @@
  *   content-extractor.js → buildStructuredContent, countFormulas, exportToWord
  */
 
-// ── 判断选区是否在助手回复内 ─────────────────────────────────────────────
+// ── 判断选区是否包含公式或在 AI 回复区内 ────────────────────────────────
 
 function selectionTouchesResponse() {
   const sel = window.getSelection();
   if (!sel || sel.rangeCount === 0) return false;
 
+  // 通用检测：选区内是否含有 KaTeX 公式（适用于所有支持网站）
+  const container = document.createElement("div");
+  container.appendChild(sel.getRangeAt(0).cloneContents());
+  if (container.querySelector(".katex")) return true;
+
+  // ChatGPT 专属：检查是否在助手回复区域（用于无公式段落的范围限定）
   for (const node of [sel.anchorNode, sel.focusNode]) {
     if (!node) continue;
     let el = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
