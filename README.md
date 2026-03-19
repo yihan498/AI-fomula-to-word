@@ -1,6 +1,6 @@
 # AI 公式 → Word
 
-在 ChatGPT、DeepSeek、Kimi、豆包等 AI 聊天页面，选中含数学公式的段落，按 **Ctrl+C**，浏览器自动下载一个 `.docx` 文件。用 Word 打开后，公式是**原生可编辑**的格式——不是图片，不是乱码，可以直接双击修改。
+在 ChatGPT、DeepSeek 等 AI 聊天页面，选中含数学公式的段落，按 **Ctrl+C**，浏览器自动下载一个 `.docx` 文件。用 Word 打开后，公式是**原生可编辑**的格式——不是图片，不是乱码，可以直接双击修改。
 
 ---
 
@@ -10,8 +10,6 @@
 |------|------|
 | ChatGPT | chatgpt.com |
 | DeepSeek | chat.deepseek.com |
-| Kimi | kimi.moonshot.cn / kimi.ai |
-| 豆包 | www.doubao.com |
 
 同时支持 **Chrome** 和 **Edge** 浏览器。
 
@@ -80,7 +78,7 @@ chmod +x install.sh && ./install.sh
 - Windows：双击 `server/start.bat`，保持黑色窗口开着
 - macOS/Linux：`cd server && ./start.sh`
 
-**第二步：在 AI 网站选中含公式的段落**
+**第二步：在 ChatGPT 或 DeepSeek 中选中含公式的段落**
 
 **第三步：按 Ctrl+C**
 
@@ -136,9 +134,6 @@ A：该公式的 LaTeX 语法较复杂，转换失败时会回退显示原始 La
 
 **Q：macOS 提示"无法验证开发者"？**
 A：系统设置 → 隐私与安全性 → 点"仍要打开"。
-
-**Q：Kimi 或豆包的公式没有被识别？**
-A：确认选中的段落里包含公式后再按 Ctrl+C。如果仍无效，请在 Issues 里反馈。
 
 ---
 

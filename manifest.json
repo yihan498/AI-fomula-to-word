@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AI 公式 → Word",
-  "version": "0.4.0",
-  "description": "在 ChatGPT / DeepSeek / Kimi / 豆包 选中含公式段落，Ctrl+C 自动下载可编辑公式的 Word 文件。需本地服务器配合。",
+  "version": "0.5.0",
+  "description": "在 ChatGPT / DeepSeek 选中含公式段落，Ctrl+C 自动下载可编辑公式的 Word 文件。需本地服务器配合。",
 
   "permissions": ["tabs"],
 
@@ -10,9 +10,6 @@
     "https://chatgpt.com/*",
     "https://chat.openai.com/*",
     "https://chat.deepseek.com/*",
-    "https://www.doubao.com/*",
-    "https://kimi.moonshot.cn/*",
-    "https://kimi.ai/*",
     "http://127.0.0.1:5678/*"
   ],
 
@@ -36,10 +33,7 @@
       "matches": [
         "https://chatgpt.com/*",
         "https://chat.openai.com/*",
-        "https://chat.deepseek.com/*",
-        "https://www.doubao.com/*",
-        "https://kimi.moonshot.cn/*",
-        "https://kimi.ai/*"
+        "https://chat.deepseek.com/*"
       ],
       "js": [
         "src/content/content-extractor.js",
