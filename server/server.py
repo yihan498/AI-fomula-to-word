@@ -18,11 +18,17 @@ from docx_builder import build_docx
 # ── app setup ──────────────────────────────────────────────────────────────
 
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024  # 5 MB
 
-# Allow requests from AI chat pages (content script origin) and the
-# extension popup.  Since this server only binds to 127.0.0.1 it is safe
-# to be permissive here.
-CORS(app, origins="*", supports_credentials=False)
+CORS(
+    app,
+    origins=[
+        "https://chatgpt.com",
+        "https://chat.openai.com",
+        "https://chat.deepseek.com",
+    ],
+    supports_credentials=False,
+)
 
 logging.basicConfig(
     level=logging.INFO,
