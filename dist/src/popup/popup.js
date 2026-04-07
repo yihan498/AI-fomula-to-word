@@ -5,17 +5,20 @@ const SERVER_URL = "http://127.0.0.1:5678";
 // ── 检查当前标签页是否是 ChatGPT ─────────────────────────────────────────
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const url = tabs[0]?.url || "";
-  const isGPT = url.includes("chatgpt.com") || url.includes("chat.openai.com");
+  const isChatGPT  = url.includes("chatgpt.com") || url.includes("chat.openai.com");
+  const isDeepSeek = url.includes("chat.deepseek.com");
+  const isSupported = isChatGPT || isDeepSeek;
 
   const dot  = document.getElementById("dot-page");
   const text = document.getElementById("text-page");
 
-  if (isGPT) {
+  if (isSupported) {
     dot.classList.add("active");
-    text.textContent = "ChatGPT 页面已就绪";
+    const name = isChatGPT ? "ChatGPT" : "DeepSeek";
+    text.textContent = `${name} 页面已就绪`;
   } else {
     dot.classList.add("warn");
-    text.textContent = "请切换到 ChatGPT 页面";
+    text.textContent = "请切换到 ChatGPT 或 DeepSeek 页面";
   }
 });
 
