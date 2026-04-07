@@ -87,6 +87,6 @@ if __name__ == "__main__":
     print("=" * 52)
     print("  AI 公式 → Word 转换服务器")
     print("  地址：http://127.0.0.1:5678")
-    print("  保持此窗口开启，然后在 Chrome 中使用扩展")
+    print("  保持此窗口开启，然后在浏览器中使用扩展")
     print("=" * 52)
     app.run(host="127.0.0.1", port=5678, debug=False)
