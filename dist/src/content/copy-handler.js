@@ -24,15 +24,20 @@ function selectionTouchesResponse() {
   container.appendChild(sel.getRangeAt(0).cloneContents());
   if (container.querySelector(".katex")) return true;
 
-  // ChatGPT 专属：检查是否在助手回复区域（用于无公式段落的范围限定）
+  // 检查选区是否在助手回复区域（ChatGPT / DeepSeek 通用）
   for (const node of [sel.anchorNode, sel.focusNode]) {
     if (!node) continue;
     let el = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
     while (el && el !== document.body) {
       if (!el.getAttribute) { el = el.parentElement; continue; }
+      // ChatGPT
       if (el.getAttribute("data-message-author-role") === "assistant") return true;
       if (el.classList && el.classList.contains("markdown"))            return true;
       if (el.classList && el.classList.contains("prose"))               return true;
+      // DeepSeek
+      if (el.classList && el.classList.contains("ds-markdown"))         return true;
+      if (el.classList && el.classList.contains("ds-markdown--block"))  return true;
+      if (el.getAttribute("data-testid") === "chat-message-assistant") return true;
       el = el.parentElement;
     }
   }
