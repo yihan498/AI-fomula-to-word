@@ -243,7 +243,14 @@ async function exportToWord(structured) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "chatgpt-export.docx";
+  // 根据来源网站 + 日期动态命名
+  const host = location.hostname || "";
+  let siteName = "ai";
+  if (host.includes("chatgpt.com") || host.includes("chat.openai.com")) siteName = "chatgpt";
+  else if (host.includes("chat.deepseek.com")) siteName = "deepseek";
+  const dateStr = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const timeStr = new Date().toTimeString().slice(0, 5).replace(":", ""); // HHmm
+  a.download = `${siteName}-${dateStr}-${timeStr}.docx`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

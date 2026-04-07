@@ -71,7 +71,7 @@ def convert():
             ".wordprocessingml.document"
         ),
         as_attachment=True,
-        download_name="chatgpt-export.docx",
+        download_name="ai-export.docx",
     )
 
 
