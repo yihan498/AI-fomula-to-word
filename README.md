@@ -39,7 +39,7 @@ cd server
 chmod +x install.sh && ./install.sh
 ```
 
-安装的依赖包括：`flask`、`flask-cors`、`python-docx`、`latex2mathml`、`lxml`。
+脚本会自动读取 `server/requirements.txt` 安装所有依赖（flask、flask-cors、python-docx、latex2mathml、lxml）。
 
 ### 第三步：加载浏览器扩展
 
@@ -74,6 +74,8 @@ chmod +x install.sh && ./install.sh
 
 > 纯文字段落（不含公式）不会被拦截，Ctrl+C 照常复制到剪贴板。
 
+下载的文件会按 **来源网站 + 日期时间** 自动命名，例如 `chatgpt-2026-04-07-1430.docx`、`deepseek-2026-04-07-0915.docx`，方便日后回顾。
+
 ---
 
 ## 扩展图标状态说明
@@ -105,6 +107,7 @@ server/
   requirements.txt      # Python 依赖列表
   install.bat / .sh     # 一键安装依赖
   start.bat / .sh       # 启动服务器
+build.bat / build.sh    ← 修改 src 后运行，自动同步到 dist
 ```
 
 ---
@@ -122,6 +125,9 @@ A：该公式的 LaTeX 语法较复杂，转换失败时会回退显示原始 La
 
 **Q：macOS 提示"无法验证开发者"？**
 A：系统设置 → 隐私与安全性 → 点"仍要打开"。
+
+**Q：修改了 src 下的代码，但扩展没变化？**
+A：运行 `build.bat`（Windows）或 `./build.sh`（macOS/Linux）将改动同步到 `dist/`，然后在浏览器扩展页面点"重新加载"。
 
 ---
 
