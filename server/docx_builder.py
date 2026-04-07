@@ -30,6 +30,8 @@ import logging
 
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Pt, RGBColor
+from docx.oxml.ns import qn
 from lxml import etree
 
 from latex_to_omml import latex_to_omml_element
@@ -108,6 +110,37 @@ def build_docx(data: dict) -> bytes:
             para = doc.add_paragraph()
             para.alignment = WD_ALIGN_PARAGRAPH.CENTER
             _add_formula(para, block.get("latex", ""), "block")
+
+        # ── table ─────────────────────────────────────────────────────
+        elif btype == "table":
+            rows_data = block.get("rows", [])
+            if not rows_data:
+                continue
+            num_cols = max(len(r) for r in rows_data)
+            table = doc.add_table(rows=0, cols=num_cols)
+            table.style = "Table Grid"
+
+            for row_cells in rows_data:
+                row = table.add_row()
+                for i, cell_data in enumerate(row_cells):
+                    if i >= num_cols:
+                        break
+                    cell = row.cells[i]
+                    # Clear default empty paragraph
+                    cell.paragraphs[0].clear()
+                    para = cell.paragraphs[0]
+                    _fill_runs(para, cell_data.get("runs", []))
+
+                    # Style header cells: bold + grey background
+                    if cell_data.get("isHeader"):
+                        for run in para.runs:
+                            run.bold = True
+                        shading = etree.SubElement(
+                            cell._tc.get_or_add_tcPr(),
+                            qn("w:shd"),
+                        )
+                        shading.set(qn("w:fill"), "F2F2F2")
+                        shading.set(qn("w:val"), "clear")
 
         # ── list item ─────────────────────────────────────────────────
         elif btype == "list_item":

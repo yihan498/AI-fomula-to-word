@@ -136,13 +136,20 @@ function processNode(node, out) {
     return;
   }
 
-  // ── table (simple: cells → tab-separated paragraph) ──────────────
+  // ── table ─────────────────────────────────────────────────────────
   if (tag === "table") {
-    for (const row of node.querySelectorAll("tr")) {
-      const cells = Array.from(row.querySelectorAll("th, td"));
-      const text = cells.map((c) => c.textContent.trim()).join("\t");
-      if (text) out.push({ type: "paragraph", runs: [{ type: "text", content: text }] });
+    const rows = [];
+    for (const tr of node.querySelectorAll("tr")) {
+      const cells = [];
+      for (const cell of tr.querySelectorAll("th, td")) {
+        cells.push({
+          isHeader: cell.tagName.toLowerCase() === "th",
+          runs: extractInlineRuns(cell),
+        });
+      }
+      if (cells.length > 0) rows.push(cells);
     }
+    if (rows.length > 0) out.push({ type: "table", rows });
     return;
   }
 
