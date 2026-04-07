@@ -1,5 +1,5 @@
 "use strict";
 
 console.log(
-  "[ChatGPT->Word] content loaded. Select any ChatGPT response and press Ctrl+C to copy a Word-ready payload."
+  "[AI->Word] content loaded. Select any AI response and press Ctrl+C to copy a Word-ready payload."
 );

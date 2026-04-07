@@ -106,7 +106,7 @@ async function handleCopy(e) {
 
   if (formulaCount === 0) {
     // No formulas – let the browser handle it, just log
-    console.log("[ChatGPT->Word] no formulas, native copy");
+    console.log("[AI->Word] no formulas, native copy");
     return;
   }
 
@@ -115,7 +115,7 @@ async function handleCopy(e) {
   e.stopImmediatePropagation();
 
   console.log(
-    "[ChatGPT->Word] intercepted copy |",
+    "[AI->Word] intercepted copy |",
     structured.blocks.length, "blocks |",
     formulaCount, "formulas"
   );
@@ -125,12 +125,12 @@ async function handleCopy(e) {
   try {
     await exportToWord(structured);
     showToast("success", formulaCount);
-    console.log("[ChatGPT->Word] .docx downloaded successfully");
+    console.log("[AI->Word] .docx downloaded successfully");
   } catch (err) {
-    console.error("[ChatGPT->Word] export failed:", err);
+    console.error("[AI->Word] export failed:", err);
     showToast("error", 0, err.message);
   }
 }
 
 document.addEventListener("copy", handleCopy, true);
-console.log("[ChatGPT->Word] copy listener registered (路径B: 服务器模式)");
+console.log("[AI->Word] copy listener registered (路径B: 服务器模式)");
