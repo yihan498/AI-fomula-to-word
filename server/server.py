@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 
 @app.route("/health", methods=["GET"])
 def health():
-    return jsonify({"status": "ok", "version": "1.0.0"})
+    return jsonify({"status": "ok", "version": "0.6.0"})
 
 
 @app.route("/convert", methods=["POST", "OPTIONS"])

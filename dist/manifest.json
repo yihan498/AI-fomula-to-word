@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AI 公式 → Word",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "在 ChatGPT / DeepSeek 选中含公式段落，Ctrl+C 自动下载可编辑公式的 Word 文件。需本地服务器配合。",
 
   "permissions": ["tabs"],
