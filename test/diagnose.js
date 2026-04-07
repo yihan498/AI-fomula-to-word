@@ -1,18 +1,18 @@
 /**
- * diagnose.js - 在 ChatGPT 页面 DevTools Console 里粘贴运行
+ * diagnose.js - 在 AI 聊天页面（ChatGPT / DeepSeek）DevTools Console 里粘贴运行
  *
  * 注意：扩展函数在隔离环境中，console 里看不到是正常的，不代表扩展没运行。
  * 请在 **含有数学公式的对话页面** 运行此脚本。
  */
 (function () {
-  console.group("=== ChatGPT→Word 诊断 v2 ===");
+  console.group("=== AI→Word 诊断 v2 ===");
 
   // ── 1. 确认扩展是否运行 ─────────────────────────────────────
-  // content script 的 console.log 会出现在这里，搜索 "[ChatGPT→Word]" 字样
-  console.log("1. 如果扩展正常运行，上方应该有 '[ChatGPT→Word] copy 拦截已注册' 日志");
-  console.log("   （在 Console 过滤框输入 'ChatGPT→Word' 查找）");
+  // content script 的 console.log 会出现在这里，搜索 "[AI→Word]" 字样
+  console.log("1. 如果扩展正常运行，上方应该有 '[AI→Word] copy 拦截已注册' 日志");
+  console.log("   （在 Console 过滤框输入 'AI→Word' 查找）");
 
-  // ── 2. 检测 ChatGPT 当前的公式渲染方式 ─────────────────────
+  // ── 2. 检测当前页面的公式渲染方式 ───────────────────────────
   console.log("\n2. 公式渲染方式检测:");
 
   // KaTeX（旧版 / 部分版本）
@@ -24,7 +24,7 @@
   console.log("  MathJax .MathJax:", document.querySelectorAll(".MathJax").length);
   console.log("  MathJax .mjx-container:", document.querySelectorAll(".mjx-container").length);
 
-  // ChatGPT 自定义公式容器（新版可能）
+  // 自定义公式容器（部分版本可能使用）
   console.log("  [data-formula]:", document.querySelectorAll("[data-formula]").length);
   console.log("  .math-display:", document.querySelectorAll(".math-display").length);
   console.log("  .math-inline:", document.querySelectorAll(".math-inline").length);
@@ -53,7 +53,7 @@
     const rawLatex = html.match(/\$\$[\s\S]*?\$\$|\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\]/g);
     console.log("  原始 LaTeX 文本:", rawLatex ? rawLatex.length + " 处" : "无");
   } else {
-    console.log("\n3. 未找到 assistant 消息区域（请在有 GPT 回复的页面运行）");
+    console.log("\n3. 未找到 assistant 消息区域（请在有 AI 回复的页面运行）");
   }
 
   // ── 4. 验证 copy 事件是否被拦截 ────────────────────────────

@@ -1,5 +1,5 @@
 """
-server.py  –  ChatGPT → Word 本地转换服务器
+server.py  –  AI 公式 → Word 本地转换服务器
 
 监听 http://127.0.0.1:5678
   GET  /health    → 存活检查（扩展 popup 使用）
@@ -19,7 +19,7 @@ from docx_builder import build_docx
 
 app = Flask(__name__)
 
-# Allow requests from the ChatGPT page (content script origin) and the
+# Allow requests from AI chat pages (content script origin) and the
 # extension popup.  Since this server only binds to 127.0.0.1 it is safe
 # to be permissive here.
 CORS(app, origins="*", supports_credentials=False)
@@ -79,7 +79,7 @@ def convert():
 
 if __name__ == "__main__":
     print("=" * 52)
-    print("  ChatGPT → Word 转换服务器")
+    print("  AI 公式 → Word 转换服务器")
     print("  地址：http://127.0.0.1:5678")
     print("  保持此窗口开启，然后在 Chrome 中使用扩展")
     print("=" * 52)

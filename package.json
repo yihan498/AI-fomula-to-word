@@ -1,7 +1,7 @@
 {
-  "name": "chatgpt-to-word",
+  "name": "ai-formula-to-word",
   "version": "0.6.0",
-  "description": "Browser extension: copy any selected ChatGPT output (text + formulas + tables + lists) and paste into Microsoft Word with full formatting preserved.",
+  "description": "Browser extension: copy any selected AI chat output (text + formulas + tables + lists) and paste into Microsoft Word with full formatting preserved. Supports ChatGPT and DeepSeek.",
   "scripts": {
     "build": "node build.js",
     "dev": "node build.js --watch",
@@ -9,6 +9,7 @@
   },
   "keywords": [
     "chatgpt",
+    "deepseek",
     "word",
     "mathml",
     "latex",

@@ -2,7 +2,7 @@
 
 const SERVER_URL = "http://127.0.0.1:5678";
 
-// ── 检查当前标签页是否是 ChatGPT ─────────────────────────────────────────
+// ── 检查当前标签页是否是支持的 AI 网站 ───────────────────────────────────
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const url = tabs[0]?.url || "";
   const isChatGPT  = url.includes("chatgpt.com") || url.includes("chat.openai.com");

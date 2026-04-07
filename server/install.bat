@@ -1,6 +1,6 @@
 @echo off
 echo ============================================
-echo  安装 ChatGPT-to-Word 服务器依赖
+echo  安装 AI 公式 → Word 服务器依赖
 echo ============================================
 echo.
 python -m pip install flask flask-cors python-docx latex2mathml lxml

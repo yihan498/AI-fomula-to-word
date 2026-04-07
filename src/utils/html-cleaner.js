@@ -1,7 +1,7 @@
 /**
  * html-cleaner.js
  *
- * 清理从 ChatGPT 页面复制下来的 HTML：
+ * 清理从 AI 聊天页面复制下来的 HTML：
  * - 去除 class、id、style、data-*、aria-* 等无关属性
  * - 保留语义结构标签（p、ul、ol、li、table、code 等）
  * - 保护 <math> 节点内部不被修改
